@@ -1,99 +1,134 @@
 ﻿using UnityEngine;
+using System.Collections;
 
-public class MadaFollower1 : MonoBehaviour
+[RequireComponent(typeof(Rigidbody))]
+public class MadaFollowerAI : MonoBehaviour
 {
-    [Header("Player")]
+    [Header("Target")]
     public Transform player;
+    public Rigidbody playerRb;
     public MicListener playerMic;
 
     [Header("Movement")]
-    public float followDistance = 4f;
-    public float moveSpeed = 1.5f;
+    public float moveSpeed = 2.2f;
+    public float rotateSpeed = 6f;
+    public float followDistance = 3f;
 
-    [Header("Player Look Check")]
-    public float stopDot = 0.6f;
-    public float disappearTime = 2.5f;
+    [Header("Attack")]
+    public float attackDistance = 1.2f;
+    public float jumpscareDuration = 0.8f;
+    public GameObject gameOverUI;
 
     [Header("Vision")]
-    public float viewDistance = 10f;
-    public LayerMask obstacleMask;
+    public float viewDistance = 12f;
     public float eyeHeight = 1.5f;
+    public LayerMask obstacleMask;
 
     [Header("Hearing")]
     public float hearThreshold = 0.02f;
 
-    Animator animator;
+    [Header("Player Look")]
+    public float stopDot = 0.6f;
+    public float disappearTime = 2.5f;
+
+    [Header("Teleport (Terrain Safe)")]
+    public float groundRayHeight = 25f;
+    public LayerMask groundMask;
+
+    [Header("Animator")]
+    public string movingBool = "isMoving";
+    public string chasingBool = "isChasing";
+
     Rigidbody rb;
+    Animator animator;
     Renderer[] renderers;
     Collider[] colliders;
 
-    bool isFrozen = false;
-    bool isVisible = false;
-    float lookTimer = 0f;
+    bool isVisible;
+    bool isFrozen;
+    bool isChasing;
+    bool isAttacking;
+    float lookTimer;
 
     void Start()
     {
-        animator = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody>();
+        animator = GetComponentInChildren<Animator>();
         renderers = GetComponentsInChildren<Renderer>();
         colliders = GetComponentsInChildren<Collider>();
 
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
 
-        HideMada(); // bắt đầu = KHÔNG hiện
+        HideMada();
     }
 
     void FixedUpdate()
     {
-        if (!player) return;
+        if (!player || isAttacking) return;
 
-        bool playerLooking = IsPlayerLookingAtMada();
-
-        // 👁️ PLAYER ĐANG NHÌN
-        if (playerLooking)
+        // ===== PLAYER NHÌN → FREEZE =====
+        if (IsPlayerLookingAtMada())
         {
             lookTimer += Time.fixedDeltaTime;
             Freeze();
+            SetAnim(false, false);
 
             if (lookTimer >= disappearTime)
-            {
                 HideMada();
-            }
+
             return;
         }
 
-        // 👁️ PLAYER KHÔNG NHÌN
         lookTimer = 0f;
-
-        if (!isVisible)
-        {
-            ShowMadaBehindPlayer();
-            return;
-        }
-
         UnFreeze();
 
-        bool canSee = CanSeePlayer();
-        bool canHear = CanHearPlayer();
-
-        if (!canSee && !canHear)
+        // ===== CHƯA HIỆN → TELEPORT =====
+        if (!isVisible)
         {
-            StopMoving();
+            TeleportBehindPlayerSafe();
             return;
         }
 
-        FollowPlayer();
+        // ===== SENSE =====
+        bool canSee = CanSeePlayer();
+        bool canHear = CanHearPlayer();
+        isChasing = canSee || canHear;
+
+        if (!isChasing)
+        {
+            SetAnim(false, false);
+            return;
+        }
+
+        // ===== CHASE =====
+        ChasePlayer();
     }
 
-    // ================= LOOK =================
+    // ================= CHASE & ATTACK =================
 
-    bool IsPlayerLookingAtMada()
+    void ChasePlayer()
     {
-        if (!isVisible) return false;
+        Vector3 target = player.position;
+        target.y = transform.position.y;
 
-        Vector3 dirToMada = (transform.position - player.position).normalized;
-        float dot = Vector3.Dot(player.forward, dirToMada);
-        return dot > stopDot;
+        Vector3 dir = target - transform.position;
+        float dist = dir.magnitude;
+
+        // ATTACK
+        if (dist <= attackDistance)
+        {
+            StartCoroutine(JumpscareSequence());
+            return;
+        }
+
+        Vector3 move = dir.normalized * moveSpeed * Time.fixedDeltaTime;
+        rb.MovePosition(rb.position + move);
+
+        Quaternion rot = Quaternion.LookRotation(dir);
+        rb.MoveRotation(Quaternion.Slerp(transform.rotation, rot, rotateSpeed * Time.fixedDeltaTime));
+
+        SetAnim(true, true); // Crawl
     }
 
     // ================= SENSE =================
@@ -104,9 +139,8 @@ public class MadaFollower1 : MonoBehaviour
         Vector3 dir = (player.position - origin).normalized;
 
         if (Physics.Raycast(origin, dir, out RaycastHit hit, viewDistance, ~obstacleMask))
-        {
             return hit.transform == player;
-        }
+
         return false;
     }
 
@@ -115,34 +149,105 @@ public class MadaFollower1 : MonoBehaviour
         return playerMic && playerMic.loudness > hearThreshold;
     }
 
-    // ================= MOVE =================
-
-    void FollowPlayer()
+    bool IsPlayerLookingAtMada()
     {
-        Vector3 targetPos = player.position - player.forward * followDistance;
-        targetPos.y = transform.position.y;
+        if (!isVisible) return false;
 
-        Vector3 moveDir = targetPos - transform.position;
+        Vector3 dir = (transform.position - player.position).normalized;
+        float dot = Vector3.Dot(player.forward, dir);
+        return dot > stopDot;
+    }
 
-        if (moveDir.magnitude > 0.2f)
+    // ================= TELEPORT SAFE (FPS + TERRAIN) =================
+
+    void TeleportBehindPlayerSafe()
+    {
+        Camera cam = Camera.main;
+        if (!cam) return;
+
+        Vector3 backDir = -player.forward;
+        backDir.y = 0f;
+        backDir.Normalize();
+
+        Vector3 desiredPos = player.position + backDir * followDistance;
+
+        // Không teleport nếu còn trong FOV
+        Vector3 vp = cam.WorldToViewportPoint(desiredPos);
+        if (vp.z > 0 && vp.x > 0 && vp.x < 1 && vp.y > 0 && vp.y < 1)
+            return;
+
+        Vector3 rayOrigin = desiredPos + Vector3.up * groundRayHeight;
+
+        if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit,
+            groundRayHeight * 2f, groundMask))
         {
-            Vector3 move = moveDir.normalized * moveSpeed * Time.fixedDeltaTime;
-            rb.MovePosition(rb.position + move);
-
-            Quaternion lookRot = Quaternion.LookRotation(moveDir);
-            rb.MoveRotation(Quaternion.Slerp(transform.rotation, lookRot, 5f * Time.fixedDeltaTime));
-
-            animator.SetBool("isMoving", true);
-        }
-        else
-        {
-            StopMoving();
+            transform.position = hit.point;
+            transform.LookAt(player);
+            ShowMada();
         }
     }
 
-    void StopMoving()
+    // ================= JUMPSCARE =================
+
+    IEnumerator JumpscareSequence()
     {
-        animator.SetBool("isMoving", false);
+        isAttacking = true;
+
+        rb.linearVelocity = Vector3.zero;
+        SetAnim(false, false);
+
+        // Khóa player
+        if (playerRb)
+        {
+            playerRb.linearVelocity = Vector3.zero;
+            playerRb.isKinematic = true;
+        }
+
+        // Đưa MADA sát camera
+        Camera cam = Camera.main;
+        if (cam)
+        {
+            transform.position = cam.transform.position + cam.transform.forward * 0.5f;
+            transform.LookAt(cam.transform);
+        }
+
+        yield return StartCoroutine(CameraShake(0.4f, 0.25f));
+        yield return new WaitForSeconds(jumpscareDuration);
+
+        if (gameOverUI)
+            gameOverUI.SetActive(true);
+
+        Time.timeScale = 0f;
+    }
+
+    IEnumerator CameraShake(float duration, float magnitude)
+    {
+        Camera cam = Camera.main;
+        if (!cam) yield break;
+
+        Transform t = cam.transform;
+        Vector3 originalPos = t.localPosition;
+
+        float time = 0f;
+        while (time < duration)
+        {
+            t.localPosition = originalPos +
+                new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0f) * magnitude;
+
+            time += Time.deltaTime;
+            yield return null;
+        }
+
+        t.localPosition = originalPos;
+    }
+
+    // ================= ANIM =================
+
+    void SetAnim(bool moving, bool chasing)
+    {
+        if (!animator) return;
+        animator.SetBool(movingBool, moving);
+        animator.SetBool(chasingBool, chasing);
     }
 
     // ================= FREEZE =================
@@ -161,39 +266,27 @@ public class MadaFollower1 : MonoBehaviour
     {
         if (!isFrozen) return;
         isFrozen = false;
-
         animator.speed = 1f;
     }
 
-    // ================= APPEAR / DISAPPEAR =================
+    // ================= VISIBILITY =================
 
     void HideMada()
     {
         isVisible = false;
+        isChasing = false;
+        lookTimer = 0f;
+        SetAnim(false, false);
 
-        foreach (var r in renderers)
-            r.enabled = false;
-
-        foreach (var c in colliders)
-            c.enabled = false;
+        foreach (var r in renderers) r.enabled = false;
+        foreach (var c in colliders) c.enabled = false;
     }
 
-    void ShowMadaBehindPlayer()
+    void ShowMada()
     {
         isVisible = true;
 
-        Vector3 spawnPos = player.position - player.forward * followDistance;
-        spawnPos.y = transform.position.y;
-
-        transform.position = spawnPos;
-        transform.LookAt(player);
-
-        foreach (var r in renderers)
-            r.enabled = true;
-
-        foreach (var c in colliders)
-            c.enabled = true;
-
-        lookTimer = 0f;
+        foreach (var r in renderers) r.enabled = true;
+        foreach (var c in colliders) c.enabled = true;
     }
 }
