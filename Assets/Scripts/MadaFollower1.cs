@@ -304,7 +304,20 @@ public class MadaFollowerAI : MonoBehaviour
         if (gameOverUI)
             gameOverUI.SetActive(true);
 
+        // ===== GAME OVER STATE =====
         Time.timeScale = 0f;
+
+        // MỞ CHUỘT
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        // TẮT TOÀN BỘ PLAYER CONTROL
+        if (player)
+        {
+            MonoBehaviour[] scripts = player.GetComponentsInChildren<MonoBehaviour>();
+            foreach (var s in scripts)
+                s.enabled = false;
+        }
     }
 
     // ================= ANIM =================

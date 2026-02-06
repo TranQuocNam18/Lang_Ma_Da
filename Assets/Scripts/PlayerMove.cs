@@ -41,6 +41,9 @@ public class PlayerMove : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
         col = GetComponent<CapsuleCollider>();
 
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
         animator.applyRootMotion = false;
         originalCamHeight = cameraHolder.localPosition.y;
         originalHeight = col.height;

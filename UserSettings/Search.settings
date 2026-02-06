@@ -9,9 +9,9 @@ onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = false
 scopes = {
-	"last_search.66F56946" = "linearVelocity"
+	"last_search.66F56946" = "Build Settings"
 	"OpenInspectorPreview.66F56946" = "0"
-	"currentGroup.66F56946" = "asset"
+	"currentGroup.66F56946" = "all"
 }
 providers = {
 	asset = {
@@ -68,6 +68,8 @@ providers = {
 objectSelectors = {
 }
 recentSearches = [
+	"Build Settings"
+	"Build Build Settings"
 	"linearVelocity"
 ]
 searchItemFavorites = [
