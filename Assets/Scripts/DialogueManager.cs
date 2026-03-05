@@ -7,6 +7,7 @@ public class DialogueManager : MonoBehaviour
 
     public GameObject dialoguePanel;
     public TextMeshProUGUI dialogueText;
+    public bool isTalking = false;
 
     private string[] lines;
     private int index = 0;
@@ -38,12 +39,13 @@ public class DialogueManager : MonoBehaviour
 
         dialoguePanel.SetActive(true);
         dialogueText.text = lines[index];
+        isTalking = true;
 
         if (GameManager.Instance != null)
             GameManager.Instance.StartDialogue();
     }
 
-    void NextLine()
+    public void NextLine()
     {
         index++;
 
@@ -63,6 +65,7 @@ public class DialogueManager : MonoBehaviour
 
         if (GameManager.Instance != null)
             GameManager.Instance.EndDialogue();
+        isTalking = false;
 
         // chỉ bắt đầu nhiệm vụ 1 lần
         if (!ObjectiveManager.Instance.objectiveStarted)

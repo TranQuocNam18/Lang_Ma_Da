@@ -16,7 +16,7 @@ public class NoteInteraction : MonoBehaviour
         }
     }
 
-    void ReadNote()
+    public void ReadNote()
     {
         hasRead = true;
 

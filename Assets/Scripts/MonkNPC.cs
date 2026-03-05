@@ -25,7 +25,7 @@ public class MonkNPC : MonoBehaviour
         }
     }
 
-    void StartTalk()
+    public void StartTalk()
     {
         isTalking = true;
 
