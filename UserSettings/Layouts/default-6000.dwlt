@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 1536
     height: 772.8
   m_ShowMode: 4
-  m_Title: Inspector
+  m_Title: Project
   m_RootView: {fileID: 2}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -119,7 +119,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 112}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 69
+  controlID: 129
   draggingID: 0
 --- !u!114 &6
 MonoBehaviour:
@@ -145,7 +145,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 112}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 70
+  controlID: 130
   draggingID: 0
 --- !u!114 &7
 MonoBehaviour:
@@ -171,7 +171,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 56}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 71
+  controlID: 131
   draggingID: 0
 --- !u!114 &8
 MonoBehaviour:
@@ -251,7 +251,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 56}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 90
+  controlID: 1231
   draggingID: 0
 --- !u!114 &11
 MonoBehaviour:
@@ -263,7 +263,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: ConsoleWindow
+  m_Name: ProjectBrowser
   m_EditorClassIdentifier: UnityEditor.dll::UnityEditor.DockArea
   m_Children: []
   m_Position:
@@ -272,14 +272,14 @@ MonoBehaviour:
     y: 0
     width: 748.8
     height: 261.59998
-  m_MinSize: {x: 101, y: 126}
-  m_MaxSize: {x: 4001, y: 4026}
-  m_ActualView: {fileID: 21}
+  m_MinSize: {x: 231, y: 276}
+  m_MaxSize: {x: 10001, y: 10026}
+  m_ActualView: {fileID: 20}
   m_Panes:
   - {fileID: 20}
   - {fileID: 21}
-  m_Selected: 1
-  m_LastSelected: 0
+  m_Selected: 0
+  m_LastSelected: 1
 --- !u!114 &12
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -325,8 +325,8 @@ MonoBehaviour:
     y: 0
     width: 380.80005
     height: 716.8
-  m_MinSize: {x: 276, y: 76}
-  m_MaxSize: {x: 4001, y: 4026}
+  m_MinSize: {x: 275, y: 50}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 22}
   m_Panes:
   - {fileID: 22}
@@ -653,7 +653,7 @@ MonoBehaviour:
     m_DynamicPanelBehavior: 0
   m_LockTracker:
     m_IsLocked: 0
-  m_LastSelectedObjectID: 46788
+  m_LastSelectedObjectID: 72994
 --- !u!114 &16
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -696,32 +696,34 @@ MonoBehaviour:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs:
-      - m_Data: 46788
+      - m_Data: 72994
       m_LastClickedID:
-        m_Data: 46788
+        m_Data: 0
       m_ExpandedIDs:
-      - m_Data: -44370
-      - m_Data: -42322
-      - m_Data: -41332
-      - m_Data: -30504
+      - m_Data: -54354
+      - m_Data: -53644
+      - m_Data: -43826
+      - m_Data: -35518
+      - m_Data: -24072
+      - m_Data: -23998
+      - m_Data: -18628
+      - m_Data: -11308
+      - m_Data: -9540
       - m_Data: -1294
-      - m_Data: 46452
-      - m_Data: 46676
-      - m_Data: 46778
-      - m_Data: 46856
-      - m_Data: 46942
-      - m_Data: 47136
-      - m_Data: 47160
-      - m_Data: 47318
-      - m_Data: 47346
-      - m_Data: 47348
-      - m_Data: 47368
-      - m_Data: 47388
-      - m_Data: 47422
+      - m_Data: 46474
+      - m_Data: 46736
+      - m_Data: 46840
+      - m_Data: 46906
+      - m_Data: 46916
+      - m_Data: 51852
+      - m_Data: 52108
+      - m_Data: 62308
+      - m_Data: 62414
+      - m_Data: 62430
       m_RenameOverlay:
         m_UserAcceptedRename: 0
-        m_Name: 
-        m_OriginalName: 
+        m_Name: Su thay
+        m_OriginalName: Su thay
         m_EditFieldRect:
           serializedVersion: 2
           x: 0
@@ -729,10 +731,10 @@ MonoBehaviour:
           width: 0
           height: 0
         m_UserData:
-          m_Data: 0
+          m_Data: -9540
         m_IsWaitingForDelay: 0
         m_IsRenaming: 0
-        m_OriginalEventType: 11
+        m_OriginalEventType: 0
         m_IsRenamingFilename: 0
         m_TrimLeadingAndTrailingWhitespace: 0
         m_ClientGUIView: {fileID: 8}
@@ -1441,9 +1443,9 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
-    m_Target: {x: 59.254246, y: 36.947536, z: -51.219936}
+    m_Target: {x: 55.00142, y: 38.772255, z: -51.20552}
     speed: 2
-    m_Value: {x: 59.254246, y: 36.947536, z: -51.219936}
+    m_Value: {x: 960, y: 540, z: 0}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -1489,13 +1491,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: -0.38453463, y: -0.13252603, z: 0.055978987, w: -0.9120506}
+    m_Target: {x: -0.01740998, y: -0.9825216, z: 0.14666843, w: -0.11523681}
     speed: 2
-    m_Value: {x: -0.38445777, y: -0.13249953, z: 0.0559678, w: -0.91186833}
+    m_Value: {x: -0.010184431, y: 0.022429146, z: 0.00046839492, w: 0.99969643}
   m_Size:
-    m_Target: 0.7088723
+    m_Target: 7.425372
     speed: 2
-    m_Value: 0.7088723
+    m_Value: 37.165173
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -1639,9 +1641,9 @@ MonoBehaviour:
       e32: 0
       e33: 1
   m_PreviewAnimator: {fileID: 0}
-  m_AnimatorController: {fileID: 9100000, guid: 3926598ad4d612646a88bf0589a75bf2, type: 2}
+  m_AnimatorController: {fileID: 9100000, guid: 40b821b02c1e03745beef6de132ef48a, type: 2}
   m_BreadCrumbs:
-  - m_Target: {fileID: 528802100927846046, guid: 3926598ad4d612646a88bf0589a75bf2, type: 2}
+  - m_Target: {fileID: -7651583567725942405, guid: 40b821b02c1e03745beef6de132ef48a, type: 2}
     m_ScrollPosition: {x: 0, y: 0}
   stateMachineGraph: {fileID: 0}
   stateMachineGraphGUI: {fileID: 0}
@@ -1720,26 +1722,27 @@ MonoBehaviour:
     m_IsLocked: 0
   m_LastLocalAssetsSearchArea: 1
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 79}
+    scrollPos: {x: 0, y: 120}
     m_SelectedIDs:
-    - m_Data: 48216
+    - m_Data: 48346
     m_LastClickedID:
-      m_Data: 48216
+      m_Data: 48346
     m_ExpandedIDs:
     - m_Data: 0
-    - m_Data: 47810
-    - m_Data: 47812
-    - m_Data: 47814
-    - m_Data: 47816
-    - m_Data: 47818
-    - m_Data: 47820
-    - m_Data: 47822
-    - m_Data: 47824
+    - m_Data: 47936
+    - m_Data: 47938
+    - m_Data: 47940
+    - m_Data: 47942
+    - m_Data: 47944
+    - m_Data: 47946
+    - m_Data: 47948
+    - m_Data: 47950
+    - m_Data: 48346
     - m_Data: 1000000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
+      m_Name: IgniteCoders
+      m_OriginalName: IgniteCoders
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
@@ -1747,10 +1750,10 @@ MonoBehaviour:
         width: 0
         height: 0
       m_UserData:
-        m_Data: 0
+        m_Data: 48336
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 11
+      m_OriginalEventType: 0
       m_IsRenamingFilename: 1
       m_TrimLeadingAndTrailingWhitespace: 0
       m_ClientGUIView: {fileID: 11}
@@ -1768,14 +1771,14 @@ MonoBehaviour:
       m_Data: 0
     m_ExpandedIDs:
     - m_Data: 0
-    - m_Data: 47810
-    - m_Data: 47812
-    - m_Data: 47814
-    - m_Data: 47816
-    - m_Data: 47818
-    - m_Data: 47820
-    - m_Data: 47822
-    - m_Data: 47824
+    - m_Data: 47936
+    - m_Data: 47938
+    - m_Data: 47940
+    - m_Data: 47942
+    - m_Data: 47944
+    - m_Data: 47946
+    - m_Data: 47948
+    - m_Data: 47950
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1802,8 +1805,9 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: []
-    m_LastClickedInstanceID: 0
+    m_SelectedInstanceIDs:
+    - m_Data: 72994
+    m_LastClickedInstanceID: 72994
     m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs:
     - m_Data: 49326
@@ -1819,6 +1823,7 @@ MonoBehaviour:
     - m_Data: 48494
     - m_Data: 47938
     - m_Data: 63876
+    - m_Data: 76954
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1844,7 +1849,7 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
     m_NewAssetIndexInList: -1
-    m_ScrollPosition: {x: 0, y: 66.400024}
+    m_ScrollPosition: {x: 0, y: 0}
     m_GridSize: 49
   m_SkipHiddenPackages: 0
   m_DirectoriesAreaWidth: 92.19999
