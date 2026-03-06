@@ -23,19 +23,8 @@ public class PlayerInteract : MonoBehaviour
                 interactText.SetActive(true);
                 interactText.GetComponent<TextMeshProUGUI>().text = "Nói chuyện [F]";
 
-                if (Input.GetKeyDown(KeyCode.F))
-                {
-                    // nếu đang nói chuyện thì chuyển câu
-                    if (DialogueManager.Instance.isTalking)
-                    {
-                        DialogueManager.Instance.NextLine();
-                    }
-                    else
-                    {
-                        monk.StartTalk();
-                    }
-                }
-
+                // Xử lý phím F đã được chuyển sang MonkNPC.cs và DialogueManager.cs
+                // để tránh bị nhận đúp (double input)
                 return;
             }
 

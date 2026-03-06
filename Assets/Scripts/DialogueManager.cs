@@ -11,6 +11,7 @@ public class DialogueManager : MonoBehaviour
 
     private string[] lines;
     private int index = 0;
+    private float nextLineCooldown = 0f;
 
     void Awake()
     {
@@ -19,9 +20,18 @@ public class DialogueManager : MonoBehaviour
 
     void Update()
     {
-        if (dialoguePanel.activeSelf && Input.GetKeyDown(KeyCode.F))
+        if (Instance != this) return;
+
+        if (nextLineCooldown > 0f)
         {
+            nextLineCooldown -= Time.unscaledDeltaTime;
+        }
+
+        if (dialoguePanel.activeSelf && nextLineCooldown <= 0f && Input.GetKeyDown(KeyCode.F))
+        {
+            nextLineCooldown = 0.2f;
             NextLine();
+            Input.ResetInputAxes(); // Xóa trạng thái phím trong frame này
         }
     }
 
@@ -40,6 +50,7 @@ public class DialogueManager : MonoBehaviour
         dialoguePanel.SetActive(true);
         dialogueText.text = lines[index];
         isTalking = true;
+        nextLineCooldown = 0.2f;
 
         if (GameManager.Instance != null)
             GameManager.Instance.StartDialogue();
@@ -72,7 +83,7 @@ public class DialogueManager : MonoBehaviour
         {
             ObjectiveManager.Instance.StartObjective();
         }
-
+        SkyManager.Instance.ChangeToDark();
         // reset trạng thái NPC
         MonkNPC monk = FindObjectOfType<MonkNPC>();
         if (monk != null)
