@@ -6,7 +6,8 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     public GameObject gameOverPanel;
-    public MadaFollowerAI madaAI; 
+    public MadaFollowerAI madaAI;
+    public GameObject[] otherUIPanels;
 
     public bool isGameOver = false;
     public bool isDialogue = false; // thêm trạng thái hội thoại
@@ -36,6 +37,13 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         isGameOver = true;
+
+        // tắt UI khác
+        foreach (GameObject ui in otherUIPanels)
+        {
+            if (ui != null)
+                ui.SetActive(false);
+        }
 
         gameOverPanel.SetActive(true);
 
