@@ -15,11 +15,21 @@ EditorUserSettings:
       value: 50020252030c08585a5b597016210844454e1e787b7f2065742d4d37b7e6646b
       flags: 0
     RecentlyUsedSceneGuid-2:
+<<<<<<< HEAD
       value: 00095755510c5d020957082612750c44464f487c747c7232757a1b66e4b73739
+=======
+      value: 57010455520351590857592447775a4440151e2828707466287d4b36b6b4666e
+>>>>>>> Bao-Dev
       flags: 0
     RecentlyUsedSceneGuid-3:
       value: 5a08575f5207595a0f5d59741173094444164f7d7d2a23317c7a4465bbe1646d
       flags: 0
+<<<<<<< HEAD
+=======
+    RecentlyUsedSceneGuid-4:
+      value: 00095755510c5d020957082612750c44464f487c747c7232757a1b66e4b73739
+      flags: 0
+>>>>>>> Bao-Dev
     lightmappingBakingProfile:
       value: 51
       flags: 0
