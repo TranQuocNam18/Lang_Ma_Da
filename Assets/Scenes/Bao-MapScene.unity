@@ -9955,7 +9955,7 @@ Terrain:
   m_GameObject: {fileID: 332843358}
   m_Enabled: 1
   serializedVersion: 6
-  m_TerrainData: {fileID: 15600000, guid: c31dc82896545f648bd9c05ce067e3ed, type: 2}
+  m_TerrainData: {fileID: 0}
   m_TreeDistance: 5000
   m_TreeBillboardDistance: 50
   m_TreeCrossFadeLength: 5
@@ -34999,8 +34999,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3892eb585f614df428375adcb6993443, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInteract
-  interactDistance: 1
-  interactText: {fileID: 1441150505}
 --- !u!114 &1053692945
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71215,7 +71213,7 @@ MonoBehaviour:
   groundCheckDistance: 1.1
   groundLayer:
     serializedVersion: 2
-    m_Bits: 24
+    m_Bits: 16
 --- !u!114 &1927201879
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71251,7 +71249,7 @@ MonoBehaviour:
   groundCheck: {fileID: 1778332764}
   groundLayer:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 0
   groundRadius: 0.25
   crouchHeight: 1
   cameraHolder: {fileID: 1837719640}
@@ -76929,10 +76927,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObjectiveManager
   objectiveStarted: 0
+  objectiveCompleted: 0
   talismanUI: {fileID: 678915839}
   totalTalismans: 5
   collectedTalismans: 0
-  ritual_Door: {fileID: 1432597999}
 --- !u!114 &1982520215
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -76946,7 +76944,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   gameOverPanel: {fileID: 2017153733}
+  madaAI: {fileID: 0}
   isGameOver: 0
+  isDialogue: 0
 --- !u!4 &1982520216
 Transform:
   m_ObjectHideFlags: 0
