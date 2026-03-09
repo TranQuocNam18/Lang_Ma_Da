@@ -3,20 +3,13 @@ using TMPro;
 
 public class TalismanUI : MonoBehaviour
 {
+    // Static reference giúp GameManager luôn tìm thấy, dù GameObject đang inactive
+    public static TalismanUI Instance { get; private set; }
+
     public TextMeshProUGUI talismanText;
 
-    void Update()
+    void Awake()
     {
-        if (ObjectiveManager.Instance != null && talismanText != null)
-        {
-            if (ObjectiveManager.Instance.collectedTalismans < ObjectiveManager.Instance.totalTalismans)
-            {
-                talismanText.text = "Bùa: " + ObjectiveManager.Instance.collectedTalismans + " / " + ObjectiveManager.Instance.totalTalismans;
-            }
-            else
-            {
-                talismanText.text = "Đã đủ bùa hãy quay lại chỗ sư thầy";
-            }
-        }
+        Instance = this;
     }
 }
