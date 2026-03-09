@@ -4,37 +4,41 @@ public class MonkNPC : MonoBehaviour
 {
     public DialogueManager dialogueManager;
 
+    [Header("Look At Player")]
+    public float lookAtSpeed = 5f;
+
     bool playerInRange = false;
     bool isTalking = false;
     float interactCooldown = 0f;
     bool hasPreGameTalked = false;
+    Transform playerTransform;
 
     // private static readonly - Unity KHÔNG serialize, luôn dùng đúng giá trị trong code
     private static readonly string[] linesMeetMonk = new string[] {
-        "Thầy Pháp: Ta đã chờ con đến đây.",
+        "Nhà sư: Ta đã chờ con đến đây.",
         "Tôi: Thầy là ai?",
-        "Thầy Pháp: Ta là người trông coi ngôi chùa cổ này... và cũng là người trấn giữ những thứ không nên tồn tại.",
+        "Nhà sư: Ta là người trông coi ngôi chùa cổ này... và cũng là người trấn giữ những thứ không nên tồn tại.",
         "Tôi: Ý thầy là mấy lời đồn về ma quỷ trong làng sao?",
-        "Thầy Pháp: Khi con bước vào đây, ta đã cảm nhận được âm khí bám theo con.",
+        "Nhà sư: Khi con bước vào đây, ta đã cảm nhận được âm khí bám theo con.",
         "Tôi: Âm khí? Cháu chỉ đi ngang qua mấy cái hồ thôi mà.",
-        "Thầy Pháp: Chính những hồ nước đó là nơi Ma Da trú ngụ.",
-        "Thầy Pháp: Những vong hồn chết đuối không siêu thoát, luôn tìm người thế mạng.",
+        "Nhà sư: Chính những hồ nước đó là nơi Ma Da trú ngụ.",
+        "Nhà sư: Những vong hồn chết đuối không siêu thoát, luôn tìm người thế mạng.",
         "Tôi: Thầy nói vậy là thứ đó... có thật?",
-        "Thầy Pháp: Đêm nay đừng lại gần bất kỳ ao hồ nào. Nếu không... nó sẽ tìm đến con.",
-        "Thầy Pháp: Tốt nhất con nên quay lại nhà trưởng làng nghỉ ngơi đi.",
-        "Thầy Pháp: Đi đi trước khi trời tối hẳn.",
+        "Nhà sư: Đêm nay đừng lại gần bất kỳ ao hồ nào. Nếu không... nó sẽ tìm đến con.",
+        "Nhà sư: Tốt nhất con nên quay lại nhà trưởng làng nghỉ ngơi đi.",
+        "Nhà sư: Đi đi trước khi trời tối hẳn.",
         "Tôi: Vâng cháu hiểu rồi."
     };
 
     private static readonly string[] linesPreGame = new string[] {
-        "Thầy Pháp: Tốt lắm... con đã tìm đủ 5 lá bùa phong ấn.",
+        "Nhà sư: Tốt lắm... con đã tìm đủ 5 lá bùa phong ấn.",
         "Tôi: Thầy ơi, thứ đó vẫn đang đuổi theo cháu!",
-        "Thầy Pháp: Bình tĩnh. Đây là nghi thức phong ấn cuối cùng.",
-        "Thầy Pháp: Nhưng con phải tự tay hoàn thành ấn chú.",
+        "Nhà sư: Bình tĩnh. Đây là nghi thức phong ấn cuối cùng.",
+        "Nhà sư: Nhưng con phải tự tay hoàn thành ấn chú.",
         "Tôi: Cháu phải làm gì?",
-        "Thầy Pháp: Hãy vẽ lại phù chú phong ấn bằng tất cả sự tập trung của con.",
-        "Thầy Pháp: Nếu nghi thức thất bại...",
-        "Thầy Pháp: Ma Da sẽ chiếm lấy linh hồn của con."
+        "Nhà sư: Hãy vẽ lại phù chú phong ấn bằng tất cả sự tập trung của con.",
+        "Nhà sư: Nếu nghi thức thất bại...",
+        "Nhà sư: Ma Da sẽ chiếm lấy linh hồn của con."
     };
 
     void Update()
@@ -42,6 +46,18 @@ public class MonkNPC : MonoBehaviour
         if (interactCooldown > 0f)
         {
             interactCooldown -= Time.unscaledDeltaTime;
+        }
+
+        // Nhìn về phía người chơi khi họ ở gần
+        if (playerInRange && playerTransform != null)
+        {
+            Vector3 direction = playerTransform.position - transform.position;
+            direction.y = 0f; // Không cúi/ngửa đầu
+            if (direction != Vector3.zero)
+            {
+                Quaternion targetRot = Quaternion.LookRotation(direction);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, lookAtSpeed * Time.unscaledDeltaTime);
+            }
         }
 
         if (playerInRange && !isTalking && interactCooldown <= 0f)
@@ -84,13 +100,13 @@ public class MonkNPC : MonoBehaviour
         else if (GameManager.Instance.currentState == GameManager.StoryState.SearchTalismans)
         {
             dialogueManager.StartDialogue(new string[] {
-                "Thầy Pháp: Hãy tìm bùa đi đã, bần đạo sẽ giúp con phong ấn nó."
+                "Nhà sư: Hãy tìm bùa đi đã, bần đạo sẽ giúp con phong ấn nó."
             });
         }
         else
         {
             dialogueManager.StartDialogue(new string[] {
-                "Thầy Pháp: Âm khí trong làng ngày càng nặng... con phải cẩn thận."
+                "Nhà sư: A di đà Phật..."
             });
         }
     }
@@ -106,6 +122,7 @@ public class MonkNPC : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = true;
+            playerTransform = other.transform;
         }
     }
 
@@ -114,6 +131,7 @@ public class MonkNPC : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = false;
+            playerTransform = null;
         }
     }
 }

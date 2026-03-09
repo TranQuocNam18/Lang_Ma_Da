@@ -77,14 +77,14 @@ public class DialogueManager : MonoBehaviour
 
         string contentString = line; // Lời thoại cuối cùng để hiện ra
 
-        if (line.StartsWith("Thầy Pháp:"))
+        if (line.StartsWith("Nhà sư:"))
         {
             if (textMonk != null)
             {
                 textMonk.gameObject.SetActive(true);
-                textMonk.text = "Thầy Pháp";
+                textMonk.text = "Nhà sư";
             }
-            contentString = line.Substring("Thầy Pháp:".Length).Trim();
+            contentString = line.Substring("Nhà sư:".Length).Trim();
         }
         else if (line.StartsWith("Trưởng Làng:"))
         {

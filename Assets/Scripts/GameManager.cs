@@ -81,13 +81,10 @@ public class GameManager : MonoBehaviour
 
     public void UpdateQuestUI()
     {
-        TalismanUI ui = FindFirstObjectByType<TalismanUI>();
-        // Fallback for older Unity versions:
-        if (ui == null) ui = FindObjectOfType<TalismanUI>();
-
+        TalismanUI ui = TalismanUI.Instance;
         if (ui == null || ui.talismanText == null) return;
 
-        // Ensure both the object AND its parent Canvas chain are active
+        // Kích hoạt lại GameObject và toàn bộ chuỗi cha của nó
         ui.gameObject.SetActive(true);
         Transform parent = ui.transform.parent;
         while (parent != null)
@@ -105,7 +102,7 @@ public class GameManager : MonoBehaviour
                 ui.talismanText.text = "Nói chuyện với trưởng làng";
                 break;
             case StoryState.MeetMonk:
-                ui.talismanText.text = "Đi đến Thầy Pháp";
+                ui.talismanText.text = "Đi đến Nhà sư";
                 break;
             case StoryState.NightStalking:
                 ui.talismanText.text = "Đi về làng nói chuyện trưởng làng";
@@ -121,7 +118,7 @@ public class GameManager : MonoBehaviour
                 ui.talismanText.text = $"Tìm {total} lá bùa ({count}/{total})";
                 break;
             case StoryState.ReturnMonk:
-                ui.talismanText.text = "Quay lại gặp Thầy Pháp";
+                ui.talismanText.text = "Quay lại gặp Nhà sư";
                 break;
             case StoryState.Minigame:
             case StoryState.Win:

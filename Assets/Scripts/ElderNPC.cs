@@ -4,6 +4,9 @@ public class ElderNPC : MonoBehaviour
 {
     public DialogueManager dialogueManager;
 
+    [Header("Look At Player")]
+    public float lookAtSpeed = 5f;
+
     // private để Unity KHÔNG serialize - đảm bảo dùng đúng giá trị trong code
     private static readonly string[] linesMeetElder = new string[] {
         "Trưởng Làng: Chào cậu thanh niên... Lâu lắm rồi mới có người lạ đến làng này.",
@@ -31,12 +34,25 @@ public class ElderNPC : MonoBehaviour
     bool playerInRange = false;
     bool isTalking = false;
     float interactCooldown = 0f;
+    Transform playerTransform;
 
     void Update()
     {
         if (interactCooldown > 0f)
         {
             interactCooldown -= Time.unscaledDeltaTime;
+        }
+
+        // Nhìn về phía người chơi khi họ ở gần
+        if (playerInRange && playerTransform != null)
+        {
+            Vector3 direction = playerTransform.position - transform.position;
+            direction.y = 0f;
+            if (direction != Vector3.zero)
+            {
+                Quaternion targetRot = Quaternion.LookRotation(direction);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, lookAtSpeed * Time.unscaledDeltaTime);
+            }
         }
 
         if (playerInRange && !isTalking && interactCooldown <= 0f)
@@ -97,6 +113,7 @@ public class ElderNPC : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = true;
+            playerTransform = other.transform;
         }
     }
 
@@ -105,6 +122,7 @@ public class ElderNPC : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = false;
+            playerTransform = null;
         }
     }
 }
