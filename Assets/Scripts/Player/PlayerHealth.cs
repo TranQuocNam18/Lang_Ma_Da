@@ -1,15 +1,18 @@
 using UnityEngine;
 
+// Quản lý máu và trạng thái sinh tồn của người chơi
 public class PlayerHealth : MonoBehaviour
 {
     public float maxHP = 100f;
     public float currentHP;
 
+    // Khởi tạo lượng máu ban đầu
     void Start()
     {
         currentHP = maxHP;
     }
 
+    // Xử lý khi người chơi nhận sát thương
     public void TakeDamage(float damage)
     {
         currentHP -= damage;
@@ -27,6 +30,7 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
+    // Xử lý khi người chơi hết máu
     void Die()
     {
         Debug.Log("Player chet!");
