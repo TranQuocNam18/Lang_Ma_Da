@@ -116,19 +116,8 @@ public class GameManager : MonoBehaviour
     // Cập nhật nội dung Quest (nhiệm vụ) trên UI dựa theo StoryState hiện tại
     public void UpdateQuestUI()
     {
-        TalismanUI ui = TalismanUI.Instance;
-        if (ui == null || ui.talismanText == null) return;
+        string questString = "";
 
-        // Đảm bảo UI nhiệm vụ luôn hiển thị khi cần thiết
-        ui.gameObject.SetActive(true);
-        Transform parent = ui.transform.parent;
-        while (parent != null)
-        {
-            parent.gameObject.SetActive(true);
-            parent = parent.parent;
-        }
-
-        // Thay đổi nội dung text dựa trên trạng thái game
         switch (currentState)
         {
             case StoryState.Intro:
@@ -162,11 +151,11 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
+        // Cập nhật TalismanUI cũ (nếu có)
         TalismanUI ui = TalismanUI.Instance;
         if (ui != null && ui.talismanText != null)
         {
             ui.talismanText.text = questString;
-            
             if (questString != "")
             {
                 ui.gameObject.SetActive(true);
