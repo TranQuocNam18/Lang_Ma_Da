@@ -1553,9 +1553,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1225920438}
-        m_TargetAssemblyTypeName: MenuClickSound, Assembly-CSharp
-        m_MethodName: PlayClick
+      - m_Target: {fileID: 1240457857}
+        m_TargetAssemblyTypeName: MainMenu1, Assembly-CSharp
+        m_MethodName: PlayGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
