@@ -6,13 +6,14 @@ public class DialogueManager : MonoBehaviour
     public static DialogueManager Instance;
 
     public GameObject dialoguePanel;
-    
+
     [Header("Speaker Texts")]
     public TextMeshProUGUI textMonk;
     public TextMeshProUGUI textElder;
     public TextMeshProUGUI textPlayer;
-    
-    [Header("Fallback Text")]
+    public TextMeshProUGUI textOngTam;
+
+    [Header("Dialogue Content")]
     public TextMeshProUGUI dialogueText;
 
     public bool isTalking = false;
@@ -35,18 +36,17 @@ public class DialogueManager : MonoBehaviour
             nextLineCooldown -= Time.unscaledDeltaTime;
         }
 
-        if (dialoguePanel.activeSelf && nextLineCooldown <= 0f && Input.GetKeyDown(KeyCode.F))
+        if (dialoguePanel != null && dialoguePanel.activeSelf && nextLineCooldown <= 0f && Input.GetKeyDown(KeyCode.F))
         {
             nextLineCooldown = 0.2f;
             NextLine();
-            Input.ResetInputAxes(); // Xóa trạng thái phím trong frame này
+            Input.ResetInputAxes();
         }
     }
 
     // Bắt đầu chuỗi hội thoại mới
     public void StartDialogue(string[] dialogueLines)
     {
-        // Tránh lỗi nếu mảng hội thoại rỗng
         if (dialogueLines == null || dialogueLines.Length == 0)
         {
             Debug.LogError("Dialogue lines is empty!");
@@ -56,10 +56,9 @@ public class DialogueManager : MonoBehaviour
         lines = dialogueLines;
         index = 0;
 
-        // Hiển thị Panel và bắt đầu dòng đầu tiên
         dialoguePanel.SetActive(true);
         DisplayLine(lines[index]);
-        
+
         isTalking = true;
         nextLineCooldown = 0.2f;
 
@@ -71,15 +70,13 @@ public class DialogueManager : MonoBehaviour
     // Hiển thị nội dung của một dòng hội thoại, bao gồm tên người nói
     private void DisplayLine(string line)
     {
-        // Tắt tất cả các nhãn tên nhân vật trước khi kiểm tra người nói
+        // Tắt tất cả tên nhân vật trước
         if (textMonk != null) textMonk.gameObject.SetActive(false);
         if (textElder != null) textElder.gameObject.SetActive(false);
         if (textPlayer != null) textPlayer.gameObject.SetActive(false);
+        if (textOngTam != null) textOngTam.gameObject.SetActive(false);
 
-        // Đảm bảo bật nội dung thoại
-        if (dialogueText != null) dialogueText.gameObject.SetActive(true);
-
-        string contentString = line; // Lời thoại cuối cùng để hiện ra
+        string contentString = line;
 
         // Kiểm tra tiền tố để xác định ai đang nói và hiển thị nhãn tên tương ứng
         if (line.StartsWith("Nhà sư:"))
@@ -89,6 +86,7 @@ public class DialogueManager : MonoBehaviour
                 textMonk.gameObject.SetActive(true);
                 textMonk.text = "Nhà sư";
             }
+
             contentString = line.Substring("Nhà sư:".Length).Trim();
         }
         else if (line.StartsWith("Trưởng Làng:"))
@@ -98,7 +96,18 @@ public class DialogueManager : MonoBehaviour
                 textElder.gameObject.SetActive(true);
                 textElder.text = "Trưởng Làng";
             }
+
             contentString = line.Substring("Trưởng Làng:".Length).Trim();
+        }
+        else if (line.StartsWith("Ông Tám:"))
+        {
+            if (textOngTam != null)
+            {
+                textOngTam.gameObject.SetActive(true);
+                textOngTam.text = "Ông Tám";
+            }
+
+            contentString = line.Substring("Ông Tám:".Length).Trim();
         }
         else if (line.StartsWith("Tôi:"))
         {
@@ -107,6 +116,7 @@ public class DialogueManager : MonoBehaviour
                 textPlayer.gameObject.SetActive(true);
                 textPlayer.text = "Tôi";
             }
+
             contentString = line.Substring("Tôi:".Length).Trim();
         }
 
@@ -134,30 +144,28 @@ public class DialogueManager : MonoBehaviour
     // Kết thúc chuỗi hội thoại và trả lại quyền điều khiển
     public void EndDialogue()
     {
-        dialoguePanel.SetActive(false);
+        if (dialoguePanel != null)
+            dialoguePanel.SetActive(false);
 
         if (GameManager.Instance != null)
             GameManager.Instance.EndDialogue();
+
         isTalking = false;
 
-        // Reset trạng thái tương tác của các NPC để họ có thể nói chuyện lại
+        // reset trạng thái NPC
         MonkNPC monk = FindObjectOfType<MonkNPC>();
         if (monk != null)
-        {
             monk.EndTalk();
-        }
 
         ElderNPC elder = FindObjectOfType<ElderNPC>();
         if (elder != null)
-        {
             elder.EndTalk();
-        }
+
+        OngTamNPC ongTam = FindObjectOfType<OngTamNPC>();
+        if (ongTam != null)
+            ongTam.EndTalk();
     }
 
-    /// <summary>
-    /// Trả về true nếu dialogue panel đang hiển thị.
-    /// Dùng để MonkNPC kiểm tra trước khi cho phép bắt đầu hội thoại mới.
-    /// </summary>
     public bool IsDialogueActive()
     {
         return dialoguePanel != null && dialoguePanel.activeSelf;
