@@ -34,7 +34,7 @@ public class MainMenu1 : MonoBehaviour
     {
         RunAfterClick(() =>
         {
-            SceneManager.LoadScene("Bao-MapScene");
+            SceneManager.LoadScene("Phuc_Scene");
         });
     }
 
