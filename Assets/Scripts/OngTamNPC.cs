@@ -5,6 +5,11 @@ public class OngTamNPC : MonoBehaviour
     public GameObject interactUI;
     public DialogueManager dialogueManager;
 
+    [Header("Voice")]
+    public AudioSource voiceSource;
+    public AudioClip[] ongTamVoices;        // voice cho đoạn nói lần đầu (linesOngTam)
+    public AudioClip[] ongTamRepeatVoices;  // voice cho đoạn nói lại (repeatLines) - nếu muốn
+
     [Header("Name Label")]
     public GameObject nameLabel;
 
@@ -81,6 +86,16 @@ public class OngTamNPC : MonoBehaviour
 
                 talking = true;
 
+                if (dialogueManager == null)
+                {
+                    Debug.LogError("OngTamNPC: dialogueManager reference is NULL (chưa kéo trong Inspector)");
+                    return;
+                }
+
+                // DÙNG reference trực tiếp, KHÔNG dùng DialogueManager.Instance
+                dialogueManager.currentOngTam = this;
+                dialogueManager.isOngTamRepeatDialogue = hasTalked;
+
                 if (!hasTalked)
                     dialogueManager.StartDialogue(linesOngTam);
                 else
@@ -97,6 +112,7 @@ public class OngTamNPC : MonoBehaviour
     {
         talking = false;
         hasTalked = true;
+        StopVoice();
     }
 
     private static readonly string[] linesOngTam =
@@ -124,4 +140,29 @@ public class OngTamNPC : MonoBehaviour
     {
         "Ông Tám: Cậu cứ đi lên con dốc bên phải. Trưởng Làng ở trên đó."
     };
+
+    public void StopVoice()
+    {
+        if (voiceSource != null)
+            voiceSource.Stop();
+    }
+
+    /// <summary>
+    /// Play voice theo thứ tự câu của Ông Tám (0..n-1) cho đoạn hội thoại hiện tại.
+    /// </summary>
+    public void PlayVoiceForOngTamLine(int ongTamLineIndex, bool isRepeatDialogue)
+    {
+        if (voiceSource == null) return;
+
+        AudioClip[] bank = isRepeatDialogue ? ongTamRepeatVoices : ongTamVoices;
+        if (bank == null || bank.Length == 0) return;
+        if (ongTamLineIndex < 0 || ongTamLineIndex >= bank.Length) return;
+
+        AudioClip clip = bank[ongTamLineIndex];
+        if (clip == null) return;
+
+        voiceSource.Stop();
+        voiceSource.clip = clip;
+        voiceSource.Play();
+    }
 }

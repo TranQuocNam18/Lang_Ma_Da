@@ -1,13 +1,19 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 
 public class DialogueManager : MonoBehaviour
 {
     public static DialogueManager Instance;
 
+    [HideInInspector] public MonkNPC currentMonk;
+    [HideInInspector] public ElderNPC currentElder;
+    [HideInInspector] public OngTamNPC currentOngTam;
+
+    // Dialogue của Ông Tám có 2 đoạn: lần đầu và repeat
+    [HideInInspector] public bool isOngTamRepeatDialogue = false;
     public GameObject dialoguePanel;
 
-    [Header("Speaker Texts")]
+    [Header("Speaker Labels")]
     public TextMeshProUGUI textMonk;
     public TextMeshProUGUI textElder;
     public TextMeshProUGUI textPlayer;
@@ -16,25 +22,25 @@ public class DialogueManager : MonoBehaviour
     [Header("Dialogue Content")]
     public TextMeshProUGUI dialogueText;
 
-    public bool isTalking = false;
+    [HideInInspector] public bool isTalking = false;
 
     private string[] lines;
     private int index = 0;
+
+    // dùng cho độc thoại (không có NPC)
+    private int playerVoiceCount = 0;
     private float nextLineCooldown = 0f;
 
     void Awake()
     {
-        Instance = this;
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
     }
 
     void Update()
     {
-        if (Instance != this) return;
-
         if (nextLineCooldown > 0f)
-        {
             nextLineCooldown -= Time.unscaledDeltaTime;
-        }
 
         if (dialoguePanel != null && dialoguePanel.activeSelf && nextLineCooldown <= 0f && Input.GetKeyDown(KeyCode.F))
         {
@@ -44,42 +50,94 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    // Bắt đầu chuỗi hội thoại mới
     public void StartDialogue(string[] dialogueLines)
     {
         if (dialogueLines == null || dialogueLines.Length == 0)
-        {
-            Debug.LogError("Dialogue lines is empty!");
             return;
-        }
 
         lines = dialogueLines;
         index = 0;
-
-        dialoguePanel.SetActive(true);
-        DisplayLine(lines[index]);
+        playerVoiceCount = 0;
 
         isTalking = true;
-        nextLineCooldown = 0.2f;
 
-        // Thông báo cho GameManager rằng đang trong hội thoại (để dừng game/AI)
+        // tránh bấm F nhảy dòng ngay lúc vừa mở
+        nextLineCooldown = 0.3f;
+
+        if (dialoguePanel != null)
+            dialoguePanel.SetActive(true);
+
         if (GameManager.Instance != null)
             GameManager.Instance.StartDialogue();
+
+        DisplayLine(lines[index]);
     }
 
-    // Hiển thị nội dung của một dòng hội thoại, bao gồm tên người nói
-    private void DisplayLine(string line)
+    private void StopAllDialogueVoices()
     {
-        // Tắt tất cả tên nhân vật trước
+        // Stop voice player (GameManager source)
+        if (GameManager.Instance != null && GameManager.Instance.voiceSource != null)
+            GameManager.Instance.voiceSource.Stop();
+
+        // Stop voice elder
+        if (currentElder != null && currentElder.voiceSource != null)
+            currentElder.voiceSource.Stop();
+
+        // Stop voice monk
+        if (currentMonk != null && currentMonk.voiceSource != null)
+            currentMonk.voiceSource.Stop();
+
+        // Stop voice Ông Tám
+        if (currentOngTam != null)
+            currentOngTam.StopVoice();
+    }
+
+    private void PlayPlayerVoice(int voiceIdx)
+    {
+        if (GameManager.Instance == null) return;
+        if (GameManager.Instance.voiceSource == null) return;
+        if (GameManager.Instance.playerVoices == null) return;
+
+        if (voiceIdx < 0 || voiceIdx >= GameManager.Instance.playerVoices.Length) return;
+        AudioClip clip = GameManager.Instance.playerVoices[voiceIdx];
+        if (clip == null) return;
+
+        GameManager.Instance.voiceSource.Stop();
+        GameManager.Instance.voiceSource.clip = clip;
+        GameManager.Instance.voiceSource.Play();
+    }
+
+    private void HideAllSpeakers()
+    {
         if (textMonk != null) textMonk.gameObject.SetActive(false);
         if (textElder != null) textElder.gameObject.SetActive(false);
         if (textPlayer != null) textPlayer.gameObject.SetActive(false);
         if (textOngTam != null) textOngTam.gameObject.SetActive(false);
+    }
 
-        string contentString = line;
+    private void DisplayLine(string line)
+    {
+        if (string.IsNullOrWhiteSpace(line))
+        {
+            if (dialogueText != null)
+                dialogueText.text = "";
+            HideAllSpeakers();
+            StopAllDialogueVoices();
+            return;
+        }
 
-        // Kiểm tra tiền tố để xác định ai đang nói và hiển thị nhãn tên tương ứng
-        if (line.StartsWith("Nhà sư:"))
+        // Stop trước khi play line mới để không bị chồng / câu cũ còn vang
+        StopAllDialogueVoices();
+
+        // Tắt tất cả speaker trước khi bật speaker hiện tại
+        HideAllSpeakers();
+
+        string trimmedLine = line.Trim();
+        string content = trimmedLine;
+
+        bool hasNpcSpeaker = (currentElder != null || currentMonk != null);
+
+        if (trimmedLine.StartsWith("Nhà sư:"))
         {
             if (textMonk != null)
             {
@@ -87,9 +145,12 @@ public class DialogueManager : MonoBehaviour
                 textMonk.text = "Nhà sư";
             }
 
-            contentString = line.Substring("Nhà sư:".Length).Trim();
+            content = trimmedLine.Substring("Nhà sư:".Length).Trim();
+
+            if (currentMonk != null)
+                currentMonk.PlayVoiceForLine(index);
         }
-        else if (line.StartsWith("Trưởng Làng:"))
+        else if (trimmedLine.StartsWith("Trưởng Làng:"))
         {
             if (textElder != null)
             {
@@ -97,9 +158,12 @@ public class DialogueManager : MonoBehaviour
                 textElder.text = "Trưởng Làng";
             }
 
-            contentString = line.Substring("Trưởng Làng:".Length).Trim();
+            content = trimmedLine.Substring("Trưởng Làng:".Length).Trim();
+
+            if (currentElder != null)
+                currentElder.PlayVoiceForLine(index);
         }
-        else if (line.StartsWith("Ông Tám:"))
+        else if (trimmedLine.StartsWith("Ông Tám:"))
         {
             if (textOngTam != null)
             {
@@ -107,9 +171,13 @@ public class DialogueManager : MonoBehaviour
                 textOngTam.text = "Ông Tám";
             }
 
-            contentString = line.Substring("Ông Tám:".Length).Trim();
+            content = trimmedLine.Substring("Ông Tám:".Length).Trim();
+
+            // Phát voice theo chỉ số dòng hiện tại
+            if (currentOngTam != null)
+                currentOngTam.PlayVoiceForOngTamLine(index, isOngTamRepeatDialogue);
         }
-        else if (line.StartsWith("Tôi:"))
+        else if (trimmedLine.StartsWith("Tôi:"))
         {
             if (textPlayer != null)
             {
@@ -117,53 +185,75 @@ public class DialogueManager : MonoBehaviour
                 textPlayer.text = "Tôi";
             }
 
-            contentString = line.Substring("Tôi:".Length).Trim();
+            content = trimmedLine.Substring("Tôi:".Length).Trim();
+
+            // Nếu đang nói với Ông Tám: dùng voice của Ông Tám theo index line
+            if (currentOngTam != null)
+            {
+                currentOngTam.PlayVoiceForOngTamLine(index, isOngTamRepeatDialogue);
+            }
+            else if (hasNpcSpeaker)
+            {
+                // Elder/Monk vẫn giữ như cũ
+                if (currentElder != null) currentElder.PlayVoiceForLine(index);
+                else if (currentMonk != null) currentMonk.PlayVoiceForLine(index);
+            }
+            else
+            {
+                // Độc thoại: dùng voice player theo thứ tự
+                PlayPlayerVoice(playerVoiceCount);
+                playerVoiceCount++;
+            }
+        }
+        else
+        {
+            // narration/line bình thường
+            content = trimmedLine;
         }
 
-        // Cập nhật nội dung lời thoại vào text component
         if (dialogueText != null)
-        {
-            dialogueText.text = contentString;
-        }
+            dialogueText.text = content;
     }
 
     public void NextLine()
     {
         index++;
-
-        if (index < lines.Length)
-        {
-            DisplayLine(lines[index]);
-        }
-        else
-        {
-            EndDialogue();
-        }
+        if (lines != null && index < lines.Length) DisplayLine(lines[index]);
+        else EndDialogue();
     }
 
-    // Kết thúc chuỗi hội thoại và trả lại quyền điều khiển
     public void EndDialogue()
     {
         if (dialoguePanel != null)
             dialoguePanel.SetActive(false);
 
+        isTalking = false;
+
+        StopAllDialogueVoices();
+
         if (GameManager.Instance != null)
             GameManager.Instance.EndDialogue();
 
-        isTalking = false;
+        if (currentElder != null) { currentElder.EndTalk(); currentElder = null; }
+        if (currentMonk != null) { currentMonk.EndTalk(); currentMonk = null; }
 
-        // reset trạng thái NPC
-        MonkNPC monk = FindObjectOfType<MonkNPC>();
-        if (monk != null)
-            monk.EndTalk();
+        // Ông Tám: kết thúc và advance state nếu là lần nói đầu tiên
+        if (currentOngTam != null)
+        {
+            bool wasRepeat = isOngTamRepeatDialogue;
+            currentOngTam.EndTalk();
+            currentOngTam = null;
+            isOngTamRepeatDialogue = false;
 
-        ElderNPC elder = FindObjectOfType<ElderNPC>();
-        if (elder != null)
-            elder.EndTalk();
+            if (!wasRepeat && GameManager.Instance != null &&
+                GameManager.Instance.currentState == GameManager.StoryState.MeetOngTam)
+            {
+                GameManager.Instance.AdvanceStoryState(GameManager.StoryState.MeetElder);
+            }
+            return;
+        }
 
-        OngTamNPC ongTam = FindObjectOfType<OngTamNPC>();
-        if (ongTam != null)
-            ongTam.EndTalk();
+        isOngTamRepeatDialogue = false;
     }
 
     public bool IsDialogueActive()

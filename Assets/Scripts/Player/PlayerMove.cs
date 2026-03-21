@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
+// Xử lý di chuyển, nhảy, ngồi và bơi của người chơi
 public class PlayerMove : MonoBehaviour
 {
     [Header("Move")]
@@ -98,7 +99,7 @@ public class PlayerMove : MonoBehaviour
 
         animator.SetFloat("Speed", speedValue);
 
-        // ===== SPRINT WITH STAMINA =====
+        // ===== XỬ LÝ CHẠY NHANH (SPRINT) =====
         bool wantSprint = Input.GetKey(KeyCode.LeftShift) && speedValue > 0.1f && !isCrouch && !isSwimming;
         bool canRun = playerStamina == null || playerStamina.CanRun();
 
@@ -117,7 +118,7 @@ public class PlayerMove : MonoBehaviour
             ToggleCrouch();
         }
 
-        // ===== GROUND CHECK =====
+        // ===== KIỂM TRA MẶT ĐẤT (GROUND CHECK) =====
         isGrounded = Physics.CheckSphere(
             groundCheck.position,
             groundRadius,
@@ -163,7 +164,7 @@ public class PlayerMove : MonoBehaviour
             lastRunTime = runningAudio.time;
         }
 
-        // ===== JUMP =====
+        // ===== XỬ LÝ NHẢY (JUMP) =====
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !isCrouch && !isSwimming)
         {
             jumpRequest = true;
